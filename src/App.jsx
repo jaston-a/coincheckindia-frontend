@@ -3,7 +3,9 @@ import axios from 'axios';
 import Navbar from './components/Navbar';
 import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'lucide-react';
 
-const BACKEND_URL = `http://${window.location.hostname}:8000`;
+// DYNAMIC BACKEND URL CONFIGURATION
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:8000`;
+
 // INDIVIDUAL COIN COMPONENT WITH GLASS ZOOM EFFECT
 const VariantCard = ({ variant }) => {
   const [showAd, setShowAd] = useState(false);
