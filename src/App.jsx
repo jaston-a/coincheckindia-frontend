@@ -4,8 +4,8 @@ import Navbar from './components/Navbar';
 import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'lucide-react';
 
 // DYNAMIC BACKEND URL CONFIGURATION
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:8000`;
-
+const rawUrl = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:8000`;
+const BACKEND_URL = rawUrl.replace(/\/$/, '');
 // INDIVIDUAL COIN COMPONENT WITH GLASS ZOOM EFFECT
 const VariantCard = ({ variant }) => {
   const [showAd, setShowAd] = useState(false);
