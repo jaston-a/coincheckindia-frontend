@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Contact from './components/Contact';
 import axios from 'axios';
 import Navbar from './components/Navbar';
 import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'lucide-react';
@@ -324,6 +325,9 @@ export default function App() {
               );
             })}
         </section>
+
+        {/* CONTACT US COMPONENT ADDED HERE */}
+        <Contact />
 
       </main>
     </div>
