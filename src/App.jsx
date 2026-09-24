@@ -7,18 +7,28 @@ import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'l
 // DYNAMIC BACKEND URL CONFIGURATION
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://coincheckindia-backend.onrender.com').replace(/\/$/, '');
 
-// HELPER FUNCTION: EXACT CLOUDINARY URL ENCODING WITH SPACE FIX
+// HELPER FUNCTION: FIXED CLOUDINARY & BACKEND URL ENCODING
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   
   let fixedPath = String(imagePath).trim();
 
-  // Ensure domain is present if relative path
-  if (!fixedPath.startsWith('http://') && !fixedPath.startsWith('https://')) {
-    fixedPath = `${BACKEND_URL}${fixedPath.startsWith('/') ? '' : '/'}${fixedPath}`;
+  // If it's already a full Cloudinary or external URL, use it directly
+  if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) {
+    try {
+      return encodeURI(fixedPath);
+    } catch (e) {
+      return fixedPath;
+    }
   }
 
-  // Preserve full Cloudinary URL structure with proper %20 encoding for spaces
+  // Otherwise append to backend URL cleanly
+  if (!fixedPath.startsWith('/') && !BACKEND_URL.endsWith('/')) {
+    fixedPath = `${BACKEND_URL}/${fixedPath}`;
+  } else {
+    fixedPath = `${BACKEND_URL}${fixedPath}`;
+  }
+
   try {
     return encodeURI(fixedPath);
   } catch (e) {
@@ -326,7 +336,7 @@ export default function App() {
             })}
         </section>
 
-        {/* CONTACT US COMPONENT ADDED HERE */}
+        {/* CONTACT US COMPONENT */}
         <Contact />
 
       </main>
