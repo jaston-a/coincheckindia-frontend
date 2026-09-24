@@ -7,33 +7,28 @@ import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'l
 // DYNAMIC BACKEND URL CONFIGURATION
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://coincheckindia-backend.onrender.com').replace(/\/$/, '');
 
-// HELPER FUNCTION: FIXED CLOUDINARY & BACKEND URL ENCODING
+// HELPER FUNCTION: ROBUST URL ENCODING WITH SPACE REPLACEMENT
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   
   let fixedPath = String(imagePath).trim();
 
-  // If it's already a full Cloudinary or external URL, use it directly
+  // Explicitly replace spaces with %20 so browsers and Cloudinary parse names correctly
+  fixedPath = fixedPath.replace(/ /g, '%20');
+
+  // If it's already a full external URL, return it directly
   if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) {
-    try {
-      return encodeURI(fixedPath);
-    } catch (e) {
-      return fixedPath;
-    }
+    return fixedPath;
   }
 
-  // Otherwise append to backend URL cleanly
+  // Otherwise append to backend URL safely
   if (!fixedPath.startsWith('/') && !BACKEND_URL.endsWith('/')) {
     fixedPath = `${BACKEND_URL}/${fixedPath}`;
   } else {
     fixedPath = `${BACKEND_URL}${fixedPath}`;
   }
 
-  try {
-    return encodeURI(fixedPath);
-  } catch (e) {
-    return fixedPath;
-  }
+  return fixedPath;
 };
 
 // FALLBACK PLACEHOLDER
