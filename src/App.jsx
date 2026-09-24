@@ -4,8 +4,30 @@ import Navbar from './components/Navbar';
 import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'lucide-react';
 
 // DYNAMIC BACKEND URL CONFIGURATION
-const rawUrl = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:8000`;
-const BACKEND_URL = rawUrl.replace(/\/$/, '');
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://coincheckindia-backend.onrender.com').replace(/\/$/, '');
+
+// HELPER FUNCTION: EXACT CLOUDINARY URL ENCODING WITH SPACE FIX
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  
+  let fixedPath = String(imagePath).trim();
+
+  // Ensure domain is present if relative path
+  if (!fixedPath.startsWith('http://') && !fixedPath.startsWith('https://')) {
+    fixedPath = `${BACKEND_URL}${fixedPath.startsWith('/') ? '' : '/'}${fixedPath}`;
+  }
+
+  // Preserve full Cloudinary URL structure with proper %20 encoding for spaces
+  try {
+    return encodeURI(fixedPath);
+  } catch (e) {
+    return fixedPath;
+  }
+};
+
+// FALLBACK PLACEHOLDER
+const FALLBACK_IMAGE = "https://placehold.co/400x400/f1f5f9/475569?text=No+Image+Available";
+
 // INDIVIDUAL COIN COMPONENT WITH GLASS ZOOM EFFECT
 const VariantCard = ({ variant }) => {
   const [showAd, setShowAd] = useState(false);
@@ -23,6 +45,9 @@ const VariantCard = ({ variant }) => {
     setImagePos({ x, y });
   };
 
+  const frontImgSrc = getImageUrl(variant.front_image) || FALLBACK_IMAGE;
+  const backImgSrc = getImageUrl(variant.back_image) || FALLBACK_IMAGE;
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 mb-8">
       <div>
@@ -38,31 +63,26 @@ const VariantCard = ({ variant }) => {
         {/* FRONT IMAGE CONTAINER */}
         <div className="text-center space-y-2">
           <div 
-            className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-2xl border border-gray-200 shadow-md overflow-hidden cursor-crosshair bg-gray-50 flex items-center justify-center"
+            className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-2xl border border-gray-200 shadow-md overflow-hidden cursor-crosshair bg-slate-100 flex items-center justify-center p-2"
             onMouseEnter={() => setFrontZoom(true)}
             onMouseLeave={() => setFrontZoom(false)}
             onMouseMove={(e) => handleMouseMove(e, setFrontPos)}
           >
-            {variant.front_image ? (
-              <>
-                <img 
-                  src={variant.front_image.startsWith('http') ? variant.front_image : `${BACKEND_URL}${variant.front_image}`} 
-                  alt="Front Side" 
-                  className={`w-full h-full object-cover transition-opacity duration-150 ${frontZoom ? 'opacity-0' : 'opacity-100'}`} 
-                />
-                {frontZoom && (
-                  <div 
-                    className="absolute inset-0 w-full h-full bg-no-repeat pointer-events-none scale-150"
-                    style={{
-                      backgroundImage: `url(${variant.front_image.startsWith('http') ? variant.front_image : `${BACKEND_URL}${variant.front_image}`})`,
-                      backgroundPosition: `${frontPos.x}% ${frontPos.y}%`,
-                      backgroundSize: '250%'
-                    }}
-                  />
-                )}
-              </>
-            ) : (
-              <span className="text-gray-400 text-sm">No Front Image</span>
+            <img 
+              src={frontImgSrc} 
+              alt="Front Side" 
+              onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
+              className={`w-full h-full object-contain rounded-xl transition-opacity duration-150 ${frontZoom ? 'opacity-0' : 'opacity-100'}`} 
+            />
+            {frontZoom && (
+              <div 
+                className="absolute inset-0 w-full h-full bg-no-repeat pointer-events-none scale-150"
+                style={{
+                  backgroundImage: `url("${frontImgSrc}")`,
+                  backgroundPosition: `${frontPos.x}% ${frontPos.y}%`,
+                  backgroundSize: '250%'
+                }}
+              />
             )}
           </div>
           <span className="text-sm text-gray-500 font-semibold block">Obverse (Front) <span className="text-xs text-emerald-600 font-normal">🔍 Hover to Zoom</span></span>
@@ -71,31 +91,26 @@ const VariantCard = ({ variant }) => {
         {/* BACK IMAGE CONTAINER */}
         <div className="text-center space-y-2">
           <div 
-            className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-2xl border border-gray-200 shadow-md overflow-hidden cursor-crosshair bg-gray-50 flex items-center justify-center"
+            className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-2xl border border-gray-200 shadow-md overflow-hidden cursor-crosshair bg-slate-100 flex items-center justify-center p-2"
             onMouseEnter={() => setBackZoom(true)}
             onMouseLeave={() => setBackZoom(false)}
             onMouseMove={(e) => handleMouseMove(e, setBackPos)}
           >
-            {variant.back_image ? (
-              <>
-                <img 
-                  src={variant.back_image.startsWith('http') ? variant.back_image : `${BACKEND_URL}${variant.back_image}`} 
-                  alt="Back Side" 
-                  className={`w-full h-full object-cover transition-opacity duration-150 ${backZoom ? 'opacity-0' : 'opacity-100'}`} 
-                />
-                {backZoom && (
-                  <div 
-                    className="absolute inset-0 w-full h-full bg-no-repeat pointer-events-none scale-150"
-                    style={{
-                      backgroundImage: `url(${variant.back_image.startsWith('http') ? variant.back_image : `${BACKEND_URL}${variant.back_image}`})`,
-                      backgroundPosition: `${backPos.x}% ${backPos.y}%`,
-                      backgroundSize: '250%'
-                    }}
-                  />
-                )}
-              </>
-            ) : (
-              <span className="text-gray-400 text-sm">No Back Image</span>
+            <img 
+              src={backImgSrc} 
+              alt="Back Side" 
+              onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
+              className={`w-full h-full object-contain rounded-xl transition-opacity duration-150 ${backZoom ? 'opacity-0' : 'opacity-100'}`} 
+            />
+            {backZoom && (
+              <div 
+                className="absolute inset-0 w-full h-full bg-no-repeat pointer-events-none scale-150"
+                style={{
+                  backgroundImage: `url("${backImgSrc}")`,
+                  backgroundPosition: `${backPos.x}% ${backPos.y}%`,
+                  backgroundSize: '250%'
+                }}
+              />
             )}
           </div>
           <span className="text-sm text-gray-500 font-semibold block">Reverse (Back) <span className="text-xs text-emerald-600 font-normal">🔍 Hover to Zoom</span></span>
@@ -122,7 +137,7 @@ const VariantCard = ({ variant }) => {
       {/* AdSense Button */}
       <button 
         onClick={() => setShowAd(!showAd)}
-        className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-sm"
+        className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
       >
         <ShieldCheck className="w-5 h-5 text-emerald-400" /> Verify Mint Mark Guidelines
       </button>
@@ -207,7 +222,7 @@ export default function App() {
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition ${
+                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition cursor-pointer ${
                       isActive ? color.active : color.default
                     }`}
                   >
@@ -266,7 +281,7 @@ export default function App() {
           </div>
         )}
 
-        {/* 🔙 BACK TO HOME BUTTON - Shows ONLY when a coin category is selected */}
+        {/* 🔙 BACK TO HOME BUTTON */}
         {(selectedCategory || searchQuery) && (
           <div className="flex justify-start mb-4">
             <button 
@@ -274,7 +289,7 @@ export default function App() {
                 setSelectedCategory(null);
                 setSearchQuery('');
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition shadow-sm cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Safety Guide
             </button>
