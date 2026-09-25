@@ -2,28 +2,22 @@ import React, { useState, useEffect } from 'react';
 import Contact from './components/Contact';
 import axios from 'axios';
 import Navbar from './components/Navbar';
-import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft, Shield, FileText } from 'lucide-react';
 
 // DYNAMIC BACKEND URL CONFIGURATION
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://coincheckindia-backend.onrender.com').replace(/\/$/, '');
 
-// HELPER FUNCTION: PRESERVE EXACT CASE AND REPLACE SPACES WITH %20
-// HELPER FUNCTION: THE CLOUDINARY UNDERSCORE FIX
+// HELPER FUNCTION: PRESERVE EXACT CASE AND REPLACE SPACES WITH UNDERSCORE
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   
   let fixedPath = String(imagePath).trim();
-
-  // THE EXACT FIX: Replace all spaces with underscores (_)
-  // because Cloudinary automatically converts spaces to underscores on upload!
   fixedPath = fixedPath.replace(/ /g, '_');
 
-  // If it's already a full external URL, return it directly
   if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) {
     return fixedPath;
   }
 
-  // Otherwise append to backend URL safely
   if (!fixedPath.startsWith('/') && !BACKEND_URL.endsWith('/')) {
     fixedPath = `${BACKEND_URL}/${fixedPath}`;
   } else {
@@ -36,13 +30,58 @@ const getImageUrl = (imagePath) => {
 // FALLBACK PLACEHOLDER
 const FALLBACK_IMAGE = "https://placehold.co/400x400/f1f5f9/475569?text=No+Image+Available";
 
+// PRIVACY POLICY COMPONENT
+const PrivacyPolicy = ({ onBack }) => (
+  <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 max-w-4xl mx-auto my-6 text-slate-700">
+    <button onClick={onBack} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold mb-4">
+      <ArrowLeft className="w-4 h-4" /> Back to Home
+    </button>
+    <h1 className="text-3xl font-extrabold text-slate-900 border-b pb-4">Privacy Policy</h1>
+    <p className="text-sm text-gray-500">Last updated: September 25, 2026</p>
+    
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">1. Information We Collect</h2>
+      <p>We do not collect personal identification information unless you voluntarily contact us via our contact form. Standard log files (IP addresses, browser type) are logged by our hosting providers for security and analytics.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">2. Cookies & Advertising (Google AdSense)</h2>
+      <p>CoinCheckIndia uses Google AdSense to serve advertisements. Google uses cookies (including the DoubleClick cookie) to serve ads based on users' visits to this and other websites. You may opt out of personalized advertising by visiting Google Ad Settings.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">3. Affiliate Links</h2>
+      <p>Our website contains affiliate links to third-party marketplaces like Amazon. Clicking these links may earn us a small commission at no additional cost to you.</p>
+    </section>
+  </div>
+);
+
+// TERMS & CONDITIONS COMPONENT
+const TermsAndConditions = ({ onBack }) => (
+  <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 max-w-4xl mx-auto my-6 text-slate-700">
+    <button onClick={onBack} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold mb-4">
+      <ArrowLeft className="w-4 h-4" /> Back to Home
+    </button>
+    <h1 className="text-3xl font-extrabold text-slate-900 border-b pb-4">Terms and Conditions</h1>
+    <p className="text-sm text-gray-500">Last updated: September 25, 2026</p>
+    
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">1. Educational Disclaimer</h2>
+      <p>CoinCheckIndia is an independent educational platform. We are NOT official buyers, sellers, or affiliated with the Reserve Bank of India (RBI). All coin valuations are estimates based on public auction archives.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">2. Limitation of Liability</h2>
+      <p>We are not responsible for any financial loss, fraudulent transactions, or deal failures resulting from information on this site. Always verify with certified numismatists before buying or selling.</p>
+    </section>
+  </div>
+);
+
 // INDIVIDUAL COIN COMPONENT WITH GLASS ZOOM EFFECT
 const VariantCard = ({ variant }) => {
   const [showAd, setShowAd] = useState(false);
-  
   const [frontZoom, setFrontZoom] = useState(false);
   const [frontPos, setFrontPos] = useState({ x: 0, y: 0 });
-
   const [backZoom, setBackZoom] = useState(false);
   const [backPos, setBackPos] = useState({ x: 0, y: 0 });
 
@@ -65,10 +104,7 @@ const VariantCard = ({ variant }) => {
         <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">{variant.title}</h2>
       </div>
       
-      {/* Front & Back Images with Glass Zoom Effect */}
       <div className="flex flex-col md:flex-row gap-8 justify-center items-center py-4">
-        
-        {/* FRONT IMAGE CONTAINER */}
         <div className="text-center space-y-2">
           <div 
             className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-2xl border border-gray-200 shadow-md overflow-hidden cursor-crosshair bg-slate-100 flex items-center justify-center p-2"
@@ -96,7 +132,6 @@ const VariantCard = ({ variant }) => {
           <span className="text-sm text-gray-500 font-semibold block">Obverse (Front) <span className="text-xs text-emerald-600 font-normal">🔍 Hover to Zoom</span></span>
         </div>
 
-        {/* BACK IMAGE CONTAINER */}
         <div className="text-center space-y-2">
           <div 
             className="relative w-56 h-56 sm:w-64 sm:h-64 mx-auto rounded-2xl border border-gray-200 shadow-md overflow-hidden cursor-crosshair bg-slate-100 flex items-center justify-center p-2"
@@ -125,7 +160,6 @@ const VariantCard = ({ variant }) => {
         </div>
       </div>
 
-      {/* Valuation Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-gray-50 p-5 rounded-xl border border-gray-200/80">
           <span className="text-sm text-gray-500 font-medium block mb-1">Estimated Value</span>
@@ -142,7 +176,6 @@ const VariantCard = ({ variant }) => {
         {variant.description || 'Check the coin mint mark near the year to identify authenticity.'}
       </div>
 
-      {/* AdSense Button */}
       <button 
         onClick={() => setShowAd(!showAd)}
         className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
@@ -150,7 +183,6 @@ const VariantCard = ({ variant }) => {
         <ShieldCheck className="w-5 h-5 text-emerald-400" /> Verify Mint Mark Guidelines
       </button>
 
-      {/* AdSense Space */}
       {showAd && (
         <div className="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center text-xs text-gray-500 space-y-1">
           <p className="font-semibold text-slate-700">[ Advertisement Space ]</p>
@@ -158,7 +190,6 @@ const VariantCard = ({ variant }) => {
         </div>
       )}
 
-      {/* Affiliate Link */}
       <a 
         href="https://amazon.in" 
         target="_blank" 
@@ -175,6 +206,7 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null); 
+  const [activeTab, setActiveTab] = useState('home'); // 'home', 'privacy', 'terms'
 
   const colorThemes = [
     { default: 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300', active: 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200' },
@@ -188,155 +220,128 @@ export default function App() {
 
   useEffect(() => {
     axios.get(`${BACKEND_URL}/api/categories/`)
-      .then(res => {
-        setCategories(res.data);
-      })
+      .then(res => setCategories(res.data))
       .catch(err => console.error("Error fetching categories:", err));
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans pb-16">
-      <Navbar 
-        searchQuery={searchQuery} 
-        setSearchQuery={setSearchQuery} 
-      />
+    <div className="min-h-screen bg-gray-50 text-slate-800 font-sans flex flex-col justify-between">
+      <div>
+        <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-      <main className="max-w-4xl mx-auto px-4 pt-6 space-y-6">
-        
-        {/* Banner Section */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" /> Official Indian Numismatic Valuation
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-            Indian Rare Coin & Currency Valuation
-          </h1>
-          <p className="text-gray-500 text-xs sm:text-sm">
-            Hover over coin photos to inspect mint marks closely with magic glass zoom.
-          </p>
-        </div>
+        <main className="max-w-4xl mx-auto px-4 pt-6 space-y-6">
+          {activeTab === 'privacy' && <PrivacyPolicy onBack={() => setActiveTab('home')} />}
+          {activeTab === 'terms' && <TermsAndConditions onBack={() => setActiveTab('home')} />}
 
-        {/* DENOMINATION BUTTONS BAR */}
-        <div className="space-y-2 mb-6">
-          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block px-1">
-            Select Denomination:
-          </label>
-          <div className="flex flex-wrap gap-2.5">
-            {categories.map((cat, index) => {
-                const color = colorThemes[index % colorThemes.length];
-                const isActive = selectedCategory === cat.id;
+          {activeTab === 'home' && (
+            <>
+              <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs text-center space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-xs font-semibold">
+                  <Sparkles className="w-3.5 h-3.5" /> Official Indian Numismatic Valuation
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                  Indian Rare Coin & Currency Valuation
+                </h1>
+                <p className="text-gray-500 text-xs sm:text-sm">
+                  Hover over coin photos to inspect mint marks closely with magic glass zoom.
+                </p>
+              </div>
 
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition cursor-pointer ${
-                      isActive ? color.active : color.default
-                    }`}
+              <div className="space-y-2 mb-6">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block px-1">
+                  Select Denomination:
+                </label>
+                <div className="flex flex-wrap gap-2.5">
+                  {categories.map((cat, index) => {
+                    const color = colorThemes[index % colorThemes.length];
+                    const isActive = selectedCategory === cat.id;
+
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold border transition cursor-pointer ${
+                          isActive ? color.active : color.default
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {!selectedCategory && !searchQuery && (
+                <div className="bg-white border-2 border-red-100 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <AlertTriangle className="w-6 h-6 text-red-500" />
+                    Important Collector Guidelines & Safety Warning
+                  </h2>
+                  <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
+                    <p><strong>✓ Highly Analyzed Real Data:</strong> We never add fake coins.</p>
+                    <p><strong>⚠ Beware of Scams:</strong> Never pay money online upfront.</p>
+                  </div>
+                </div>
+              )}
+
+              {(selectedCategory || searchQuery) && (
+                <div className="flex justify-start mb-4">
+                  <button 
+                    onClick={() => { setSelectedCategory(null); setSearchQuery(''); }}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold"
                   >
-                    {cat.name}
+                    <ArrowLeft className="w-4 h-4" /> Back to Safety Guide
                   </button>
-                );
-              })}
-          </div>
-        </div>
+                </div>
+              )}
 
-        {/* WELCOME / DISCLAIMER NOTE */}
-        {!selectedCategory && !searchQuery && (
-          <div className="bg-white border-2 border-red-100 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 animate-in fade-in duration-300">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
-              Important Collector Guidelines & Safety Warning
-            </h2>
-            
-            <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
-              <p className="flex items-start gap-2">
-                <span className="text-green-600 font-bold">✓</span>
-                <span><strong>Highly Analyzed Real Data:</strong> We never add fake coins. Every item displayed here is meticulously analyzed and reflects real marketplace value.</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-blue-500 font-bold">ℹ</span>
-                <span><strong>Price Variations:</strong> The final price can be different based on condition, buyer demand, and market trends.</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-orange-500 font-bold">⚠</span>
-                <span><strong>Beware of Scams:</strong> Be extremely careful with scams! Protect your identity at all times.</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-purple-500 font-bold">🔍</span>
-                <span><strong>Check Photo Clarity:</strong> If the photo provided by a seller/buyer is not clear, DO NOT proceed. Always verify using another platform or consult an expert.</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-red-500 font-bold">🚫</span>
-                <span><strong>Safe Transactions:</strong> DO NOT pay money online upfront. Always meet in a safe, public, and real physical location to exchange the coin and money.</span>
-              </p>
-            </div>
+              <section>
+                {categories
+                  .filter(cat => searchQuery ? true : cat.id === selectedCategory)
+                  .map((cat) => {
+                    const filteredVariants = (cat.variants || []).filter(v => 
+                      v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      v.mint_mark.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
 
-            <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-sm text-red-800 leading-relaxed font-medium">
-              <p className="flex items-start gap-3">
-                <span className="text-xl">⚠️</span>
-                <span>
-                  <strong>Disclaimer:</strong> CoinCheckIndia is an independent educational platform only. We are NOT a buyer, seller, or affiliated with RBI / Government of India. All valuations shown are for educational / reference purpose based on public market data. We do NOT guarantee any buying/selling. Users are solely responsible for their own transactions. Please verify with a certified numismatist before making any deal. Use at your own risk.
-                </span>
-              </p>
-            </div>
+                    return (
+                      <div key={cat.id}>
+                        {filteredVariants.length > 0 ? (
+                          filteredVariants.map((variant) => (
+                            <VariantCard key={variant.id} variant={variant} />
+                          ))
+                        ) : (
+                          selectedCategory && (
+                            <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-400 text-sm">
+                              No coin information listed under this category yet.
+                            </div>
+                          )
+                        )}
+                      </div>
+                    );
+                  })}
+              </section>
 
-            <div className="pt-4 border-t border-gray-100 text-center">
-              <p className="text-emerald-700 font-semibold text-sm">
-                👆 Select any denomination button above to start exploring!
-              </p>
-            </div>
-          </div>
-        )}
+              <Contact />
+            </>
+          )}
+        </main>
+      </div>
 
-        {/* 🔙 BACK TO HOME BUTTON */}
-        {(selectedCategory || searchQuery) && (
-          <div className="flex justify-start mb-4">
-            <button 
-              onClick={() => {
-                setSelectedCategory(null);
-                setSearchQuery('');
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition shadow-sm cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to Safety Guide
+      {/* FOOTER WITH PRIVACY & TERMS LINKS */}
+      <footer className="bg-slate-900 text-gray-400 py-8 mt-12 border-t border-slate-800">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm">
+          <div>© 2026 CoinCheckIndia. All rights reserved.</div>
+          <div className="flex gap-6 font-medium">
+            <button onClick={() => setActiveTab('privacy')} className="hover:text-emerald-400 transition flex items-center gap-1 cursor-pointer">
+              <Shield className="w-4 h-4" /> Privacy Policy
+            </button>
+            <button onClick={() => setActiveTab('terms')} className="hover:text-emerald-400 transition flex items-center gap-1 cursor-pointer">
+              <FileText className="w-4 h-4" /> Terms & Conditions
             </button>
           </div>
-        )}
-
-        {/* DIRECT FULL DETAILS LIST */}
-        <section>
-          {categories
-            .filter(cat => searchQuery ? true : cat.id === selectedCategory)
-            .map((cat) => {
-              const filteredVariants = (cat.variants || []).filter(v => 
-                v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                v.mint_mark.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (v.year && v.year.toString().includes(searchQuery))
-              );
-
-              return (
-                <div key={cat.id}>
-                  {filteredVariants.length > 0 ? (
-                    filteredVariants.map((variant) => (
-                      <VariantCard key={variant.id} variant={variant} />
-                    ))
-                  ) : (
-                    selectedCategory && (
-                      <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-400 text-sm">
-                        No coin information listed under this category yet.
-                      </div>
-                    )
-                  )}
-                </div>
-              );
-            })}
-        </section>
-
-        {/* CONTACT US COMPONENT */}
-        <Contact />
-
-      </main>
+        </div>
+      </footer>
     </div>
   );
 }
