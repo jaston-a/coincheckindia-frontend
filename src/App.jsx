@@ -278,7 +278,7 @@ export default function App() {
                     Important Collector Guidelines & Safety Warning
                   </h2>
                   <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
-                    <p><strong>✓ Highly Analyzed Real Data:</strong> We never add fake coins.</p>
+                    <p><strong>✓ Highly Analyzed Real Data:</strong> All listed coins are highly analysed for authenticity before publishing.</p>
                     <p><strong>⚠ Beware of Scams:</strong> Never pay money online upfront.</p>
                   </div>
                 </div>
