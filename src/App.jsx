@@ -1,36 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import Contact from './components/Contact';
+import Contact from './components/Contact'; // Kept your original import
 import axios from 'axios';
 import Navbar from './components/Navbar';
-import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft, Shield, FileText } from 'lucide-react';
+import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft, Shield, FileText, Info, Mail } from 'lucide-react';
 
-// DYNAMIC BACKEND URL CONFIGURATION
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://coincheckindia-backend.onrender.com').replace(/\/$/, '');
 
-// HELPER FUNCTION: PRESERVE EXACT CASE AND REPLACE SPACES WITH UNDERSCORE
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
-  
   let fixedPath = String(imagePath).trim();
   fixedPath = fixedPath.replace(/ /g, '_');
-
-  if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) {
-    return fixedPath;
-  }
-
-  if (!fixedPath.startsWith('/') && !BACKEND_URL.endsWith('/')) {
-    fixedPath = `${BACKEND_URL}/${fixedPath}`;
-  } else {
-    fixedPath = `${BACKEND_URL}${fixedPath}`;
-  }
-
+  if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) return fixedPath;
+  if (!fixedPath.startsWith('/') && !BACKEND_URL.endsWith('/')) fixedPath = `${BACKEND_URL}/${fixedPath}`;
+  else fixedPath = `${BACKEND_URL}${fixedPath}`;
   return fixedPath;
 };
 
-// FALLBACK PLACEHOLDER
 const FALLBACK_IMAGE = "https://placehold.co/400x400/f1f5f9/475569?text=No+Image+Available";
 
-// PRIVACY POLICY COMPONENT
+// --- EXPANDED LEGAL PAGES ---
+
 const PrivacyPolicy = ({ onBack }) => (
   <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 max-w-4xl mx-auto my-6 text-slate-700">
     <button onClick={onBack} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold mb-4">
@@ -41,22 +30,31 @@ const PrivacyPolicy = ({ onBack }) => (
     
     <section className="space-y-3">
       <h2 className="text-xl font-bold text-slate-800">1. Information We Collect</h2>
-      <p>We do not collect personal identification information unless you voluntarily contact us via our contact form. Standard log files (IP addresses, browser type) are logged by our hosting providers for security and analytics.</p>
+      <p>We do not collect personal identification information unless you voluntarily contact us via our contact form or email. Standard log files (IP addresses, browser type, timestamps) are logged automatically by our hosting providers for security and analytical purposes.</p>
     </section>
 
     <section className="space-y-3">
       <h2 className="text-xl font-bold text-slate-800">2. Cookies & Advertising (Google AdSense)</h2>
-      <p>CoinCheckIndia uses Google AdSense to serve advertisements. Google uses cookies (including the DoubleClick cookie) to serve ads based on users' visits to this and other websites. You may opt out of personalized advertising by visiting Google Ad Settings.</p>
+      <p>CoinCheckIndia uses Google AdSense to serve advertisements. Google uses cookies (including the DoubleClick cookie) to serve ads based on your prior visits to this and other websites. You may opt out of personalized advertising by visiting Google's Ad Settings.</p>
     </section>
 
     <section className="space-y-3">
-      <h2 className="text-xl font-bold text-slate-800">3. Affiliate Links</h2>
-      <p>Our website contains affiliate links to third-party marketplaces like Amazon. Clicking these links may earn us a small commission at no additional cost to you.</p>
+      <h2 className="text-xl font-bold text-slate-800">3. Third-Party Links</h2>
+      <p>Our website may contain links to third-party websites or marketplaces (like Amazon). We have no control over the content or privacy practices of these external sites and encourage you to read their respective privacy policies.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">4. Children's Privacy</h2>
+      <p>Our services are not directed to individuals under the age of 13. We do not knowingly collect personal information from children. If we discover that a child has provided us with personal information, we will immediately delete such data.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">5. Contact Us</h2>
+      <p>If you have any questions or concerns about this Privacy Policy, please contact us at: <strong>coincheckindia@gmail.com</strong></p>
     </section>
   </div>
 );
 
-// TERMS & CONDITIONS COMPONENT
 const TermsAndConditions = ({ onBack }) => (
   <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 max-w-4xl mx-auto my-6 text-slate-700">
     <button onClick={onBack} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold mb-4">
@@ -67,17 +65,89 @@ const TermsAndConditions = ({ onBack }) => (
     
     <section className="space-y-3">
       <h2 className="text-xl font-bold text-slate-800">1. Educational Disclaimer</h2>
-      <p>CoinCheckIndia is an independent educational platform. We are NOT official buyers, sellers, or affiliated with the Reserve Bank of India (RBI). All coin valuations are estimates based on public auction archives.</p>
+      <p>CoinCheckIndia is strictly an independent educational platform. We are NOT official buyers, sellers, dealers, or affiliated with the Reserve Bank of India (RBI). All coin valuations provided are mere estimates based on historical public auction archives.</p>
     </section>
 
     <section className="space-y-3">
-      <h2 className="text-xl font-bold text-slate-800">2. Limitation of Liability</h2>
-      <p>We are not responsible for any financial loss, fraudulent transactions, or deal failures resulting from information on this site. Always verify with certified numismatists before buying or selling.</p>
+      <h2 className="text-xl font-bold text-slate-800">2. Intellectual Property Rights</h2>
+      <p>Unless otherwise stated, CoinCheckIndia owns the intellectual property rights for all content on this website. You may access this for your own personal use, subject to restrictions set in these terms and conditions. You must not republish, sell, rent, or sub-license material from CoinCheckIndia.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">3. Limitation of Liability</h2>
+      <p>We are not responsible for any financial loss, fraudulent transactions, or deal failures resulting from the information provided on this site. You are strongly advised to consult with certified numismatists before making any financial decisions regarding buying or selling coins.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">4. Governing Law</h2>
+      <p>These terms and conditions are governed by and construed in accordance with the laws of India. Any disputes relating to these terms and conditions will be subject to the exclusive jurisdiction of the courts of India.</p>
+    </section>
+
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold text-slate-800">5. Changes to Terms</h2>
+      <p>We reserve the right to modify these terms at any time. By continuing to use the website after changes are posted, you accept the amended terms.</p>
     </section>
   </div>
 );
 
-// INDIVIDUAL COIN COMPONENT WITH GLASS ZOOM EFFECT
+const AboutUs = ({ onBack }) => (
+  <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 max-w-4xl mx-auto my-6 text-slate-700">
+    <button onClick={onBack} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold mb-4">
+      <ArrowLeft className="w-4 h-4" /> Back to Home
+    </button>
+    <h1 className="text-3xl font-extrabold text-slate-900 border-b pb-4">About Us</h1>
+    
+    <div className="space-y-4 leading-relaxed">
+      <p>Welcome to <strong>CoinCheckIndia</strong>, your trusted educational resource for Indian numismatics.</p>
+      
+      <p>Founded by passionate coin collectors and researchers, our mission is to provide accurate, highly analyzed data regarding rare Indian coins, currency notes, and their historical significance. We noticed a growing gap in reliable information and a rise in online scams within the coin collecting community. To combat this, we created CoinCheckIndia as a free, transparent educational tool.</p>
+      
+      <p><strong>What We Do:</strong></p>
+      <ul className="list-disc pl-5 space-y-2">
+        <li>Provide detailed information on mint marks, varieties, and rarities of Indian coins.</li>
+        <li>Offer estimated market valuations based on verified historical auction data.</li>
+        <li>Educate new collectors on how to identify genuine coins and avoid fraudulent schemes.</li>
+      </ul>
+
+      <p><strong>What We Do NOT Do:</strong></p>
+      <ul className="list-disc pl-5 space-y-2">
+        <li>We do not buy or sell coins directly.</li>
+        <li>We do not charge money for valuation services.</li>
+        <li>We have no official affiliation with the Reserve Bank of India (RBI) or the Government of India.</li>
+      </ul>
+
+      <p>Whether you are a seasoned numismatist or someone who just found an old coin in their grandfather's trunk, CoinCheckIndia is here to guide you with authentic knowledge. Happy collecting!</p>
+    </div>
+  </div>
+);
+
+const ContactPage = ({ onBack }) => (
+  <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6 max-w-4xl mx-auto my-6 text-slate-700">
+    <button onClick={onBack} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold mb-4">
+      <ArrowLeft className="w-4 h-4" /> Back to Home
+    </button>
+    <h1 className="text-3xl font-extrabold text-slate-900 border-b pb-4">Contact Us</h1>
+    
+    <div className="space-y-4 leading-relaxed">
+      <p>We'd love to hear from you! Whether you have a question about a specific coin's mint mark, a suggestion for the website, or general feedback, feel free to reach out.</p>
+      
+      <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-xl mt-6">
+        <h3 className="font-bold text-slate-800 text-lg mb-2">Get in Touch</h3>
+        <p className="text-slate-600 mb-4">The best way to reach the CoinCheckIndia team is via email. We strive to respond to all inquiries within 48-72 hours.</p>
+        <p className="flex items-center gap-2 text-emerald-800 font-semibold text-lg">
+          <Mail className="w-5 h-5" /> coincheckindia@gmail.com
+        </p>
+      </div>
+
+      <p className="text-sm text-gray-500 mt-6 border-t pt-4">
+        *Please note: We do not offer direct buying or selling services, and we cannot guarantee the exact value of your coin via email images alone. Always consult a certified physical grader for high-value transactions.
+      </p>
+    </div>
+  </div>
+);
+
+// --- MAIN COMPONENTS ---
+
 const VariantCard = ({ variant }) => {
   const [showAd, setShowAd] = useState(false);
   const [frontZoom, setFrontZoom] = useState(false);
@@ -206,7 +276,7 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null); 
-  const [activeTab, setActiveTab] = useState('home'); // 'home', 'privacy', 'terms'
+  const [activeTab, setActiveTab] = useState('home'); // 'home', 'privacy', 'terms', 'about', 'contact'
 
   const colorThemes = [
     { default: 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300', active: 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200' },
@@ -232,6 +302,8 @@ export default function App() {
         <main className="max-w-4xl mx-auto px-4 pt-6 space-y-6">
           {activeTab === 'privacy' && <PrivacyPolicy onBack={() => setActiveTab('home')} />}
           {activeTab === 'terms' && <TermsAndConditions onBack={() => setActiveTab('home')} />}
+          {activeTab === 'about' && <AboutUs onBack={() => setActiveTab('home')} />}
+          {activeTab === 'contact' && <ContactPage onBack={() => setActiveTab('home')} />}
 
           {activeTab === 'home' && (
             <>
@@ -247,11 +319,11 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="space-y-2 mb-6">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block px-1">
-                  Select Denomination:
-                </label>
-                <div className="flex flex-wrap gap-2.5">
+              <div className="space-y-3 mb-6">
+                <div className="bg-slate-100 border border-slate-200 rounded-lg p-3 inline-block w-full">
+                   <h3 className="text-sm font-bold text-slate-700">Select your coin to check its real market value:</h3>
+                </div>
+                <div className="flex flex-wrap gap-2.5 mt-2">
                   {categories.map((cat, index) => {
                     const color = colorThemes[index % colorThemes.length];
                     const isActive = selectedCategory === cat.id;
@@ -322,17 +394,23 @@ export default function App() {
                   })}
               </section>
 
-              <Contact />
+              {/* Removing old general Contact form from home page since we have a dedicated Contact Us page now */}
             </>
           )}
         </main>
       </div>
 
-      {/* FOOTER WITH PRIVACY & TERMS LINKS */}
+      {/* FOOTER WITH ALL 4 ADSENSE COMPLIANT LINKS */}
       <footer className="bg-slate-900 text-gray-400 py-8 mt-12 border-t border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6 text-xs sm:text-sm">
           <div>© 2026 CoinCheckIndia. All rights reserved.</div>
-          <div className="flex gap-6 font-medium">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 font-medium">
+            <button onClick={() => setActiveTab('about')} className="hover:text-emerald-400 transition flex items-center gap-1 cursor-pointer">
+              <Info className="w-4 h-4" /> About Us
+            </button>
+            <button onClick={() => setActiveTab('contact')} className="hover:text-emerald-400 transition flex items-center gap-1 cursor-pointer">
+              <Mail className="w-4 h-4" /> Contact Us
+            </button>
             <button onClick={() => setActiveTab('privacy')} className="hover:text-emerald-400 transition flex items-center gap-1 cursor-pointer">
               <Shield className="w-4 h-4" /> Privacy Policy
             </button>
