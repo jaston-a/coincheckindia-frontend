@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Contact from './components/Contact'; // Kept your original import
+import Contact from './components/Contact'; 
 import axios from 'axios';
 import Navbar from './components/Navbar';
 import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft, Shield, FileText, Info, Mail } from 'lucide-react';
@@ -50,7 +50,7 @@ const PrivacyPolicy = ({ onBack }) => (
 
     <section className="space-y-3">
       <h2 className="text-xl font-bold text-slate-800">5. Contact Us</h2>
-      <p>If you have any questions or concerns about this Privacy Policy, please contact us at: <strong>coincheckindia@gmail.com</strong></p>
+      <p>If you have any questions or concerns about this Privacy Policy, please contact us at: <strong>coincheckindia3@gmail.com</strong></p>
     </section>
   </div>
 );
@@ -135,7 +135,7 @@ const ContactPage = ({ onBack }) => (
         <h3 className="font-bold text-slate-800 text-lg mb-2">Get in Touch</h3>
         <p className="text-slate-600 mb-4">The best way to reach the CoinCheckIndia team is via email. We strive to respond to all inquiries within 48-72 hours.</p>
         <p className="flex items-center gap-2 text-emerald-800 font-semibold text-lg">
-          <Mail className="w-5 h-5" /> coincheckindia@gmail.com
+          <Mail className="w-5 h-5" /> coincheckindia3@gmail.com
         </p>
       </div>
 
@@ -393,8 +393,6 @@ export default function App() {
                     );
                   })}
               </section>
-
-              {/* Removing old general Contact form from home page since we have a dedicated Contact Us page now */}
             </>
           )}
         </main>
