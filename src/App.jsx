@@ -8,18 +8,22 @@ import { ShieldCheck, ExternalLink, Sparkles, AlertTriangle, ArrowLeft } from 'l
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_BASE_URL || 'https://coincheckindia-backend.onrender.com').replace(/\/$/, '');
 
 // HELPER FUNCTION: PRESERVE EXACT CASE AND REPLACE SPACES WITH %20
+// HELPER FUNCTION: THE CLOUDINARY UNDERSCORE FIX
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
   
   let fixedPath = String(imagePath).trim();
 
-  // If it's already a full external URL (like Cloudinary), keep exact casing and replace spaces
+  // THE EXACT FIX: Replace all spaces with underscores (_)
+  // because Cloudinary automatically converts spaces to underscores on upload!
+  fixedPath = fixedPath.replace(/ /g, '_');
+
+  // If it's already a full external URL, return it directly
   if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) {
-    return fixedPath.replace(/ /g, '%20');
+    return fixedPath;
   }
 
   // Otherwise append to backend URL safely
-  fixedPath = fixedPath.replace(/ /g, '%20');
   if (!fixedPath.startsWith('/') && !BACKEND_URL.endsWith('/')) {
     fixedPath = `${BACKEND_URL}/${fixedPath}`;
   } else {
